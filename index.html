@@ -295,9 +295,75 @@
       .btn-tema { top: 10px; right: 10px; }
     }
 
+
+    /* ===================== LOGIN E SINCRONIZAÇÃO SUPABASE ===================== */
+    body.auth-pendente > header,
+    body.auth-pendente > nav,
+    body.auth-pendente > main { display: none !important; }
+    .tela-login { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: radial-gradient(circle at 85% 10%, rgba(249,115,22,.24), transparent 32%), linear-gradient(145deg, #020617, #111827 58%, #1f2937); }
+    .tela-login.oculta { display: none; }
+    .login-card { width: min(100%, 440px); background: var(--card); color: var(--preto); border-radius: 22px; padding: 30px; box-shadow: 0 24px 70px rgba(0,0,0,.42); border-top: 5px solid var(--laranja); }
+    .login-marca { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .login-icone { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 14px; background: var(--laranja); color: #fff; font-size: 1.45rem; box-shadow: 0 5px 18px rgba(249,115,22,.35); }
+    .login-card h1 { font-size: 1.42rem; line-height: 1.2; }
+    .login-card h1 span { color: var(--laranja); }
+    .login-card .login-subtitulo { color: var(--cinza); font-size: .88rem; margin-top: 4px; }
+    .login-card .campo input { padding: 13px 14px; }
+    .btn-entrar { width: 100%; padding: 13px 16px; border: 0; border-radius: 11px; background: var(--laranja); color: #fff; font-family: inherit; font-weight: 700; font-size: .96rem; cursor: pointer; box-shadow: 0 5px 16px rgba(249,115,22,.28); }
+    .btn-entrar:hover { background: var(--laranja-escuro); }
+    .btn-entrar:disabled { opacity: .65; cursor: wait; }
+    .btn-local { width: 100%; margin-top: 10px; padding: 10px; border: 1px solid var(--borda); border-radius: 10px; background: transparent; color: var(--cinza); font-family: inherit; font-size: .82rem; cursor: pointer; }
+    .btn-local:hover { color: var(--preto); border-color: var(--laranja); }
+    .login-mensagem { min-height: 22px; margin-top: 12px; text-align: center; color: var(--vencido); font-size: .82rem; font-weight: 600; }
+    .login-seguranca { display: flex; align-items: flex-start; gap: 7px; margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--borda); color: var(--cinza); font-size: .75rem; }
+    .cabecalho-conta { position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .usuario-email { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: rgba(255,255,255,.78); font-size: .74rem; }
+    .status-sync { display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px; border: 1px solid rgba(255,255,255,.18); border-radius: 999px; background: rgba(255,255,255,.08); color: rgba(255,255,255,.88); font-size: .72rem; font-weight: 600; }
+    .status-sync::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #94a3b8; box-shadow: 0 0 0 3px rgba(148,163,184,.14); }
+    .status-sync.sincronizando::before { background: #f59e0b; animation: pulsar-sync 1s infinite; }
+    .status-sync.ok::before { background: #34d399; }
+    .status-sync.offline::before, .status-sync.erro::before { background: #f87171; }
+    .status-sync.pendente::before { background: #fbbf24; }
+    @keyframes pulsar-sync { 50% { opacity: .3; transform: scale(.75); } }
+    .btn-conta { border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08); color: #fff; border-radius: 9px; padding: 6px 9px; font-family: inherit; font-size: .72rem; font-weight: 600; cursor: pointer; }
+    .btn-conta:hover { background: rgba(255,255,255,.17); }
+    body.modo-escuro .login-card { background: var(--card); }
+    @media (max-width: 600px) {
+      .login-card { padding: 24px 20px; }
+      .cabecalho-conta { margin-top: 10px; gap: 6px; }
+      .usuario-email { width: 100%; max-width: 100%; }
+    }
+
   </style>
 </head>
-<body>
+<body class="auth-pendente">
+
+  <section class="tela-login" id="tela-login" aria-labelledby="login-titulo">
+    <div class="login-card">
+      <div class="login-marca">
+        <div class="login-icone">🖨️</div>
+        <div>
+          <h1 id="login-titulo">Controle de Impressão <span>Avante</span></h1>
+          <p class="login-subtitulo">Entre para carregar e sincronizar seus dados.</p>
+        </div>
+      </div>
+      <form id="form-login" novalidate>
+        <div class="campo">
+          <label for="login-email">E-mail</label>
+          <input type="email" id="login-email" autocomplete="email" inputmode="email" required placeholder="seuemail@exemplo.com" />
+        </div>
+        <div class="campo">
+          <label for="login-senha">Senha</label>
+          <input type="password" id="login-senha" autocomplete="current-password" required placeholder="Sua senha do Supabase" />
+        </div>
+        <button type="submit" class="btn-entrar" id="btn-entrar">Entrar</button>
+        <button type="button" class="btn-local" id="btn-modo-local">Usar somente neste aparelho por enquanto</button>
+        <p class="login-mensagem" id="login-mensagem" role="alert" aria-live="polite"></p>
+      </form>
+      <p class="login-seguranca">🔒 Seus registros são acessados somente depois do login e continuam disponíveis localmente caso a conexão caia.</p>
+    </div>
+  </section>
+
 
   <header>
     <button type="button" class="btn-tema" id="btn-tema" aria-label="Alternar modo escuro" title="Alternar modo escuro">🌙</button>
@@ -306,6 +372,13 @@
       <h1>Controle de Impressão <span>Gráfica Avante</span></h1>
     </div>
     <p>Gestão de pedidos, criação de arte, estoque, perdas e sobras</p>
+
+    <div class="cabecalho-conta" id="cabecalho-conta" hidden>
+      <span class="status-sync" id="status-sincronizacao" title="Situação da sincronização">Preparando...</span>
+      <span class="usuario-email" id="usuario-email"></span>
+      <button type="button" class="btn-conta" id="btn-sincronizar" title="Sincronizar agora">↻ Sincronizar</button>
+      <button type="button" class="btn-conta" id="btn-sair">Sair</button>
+    </div>
   </header>
 
   <nav class="abas" role="tablist" aria-label="Áreas do controle">
@@ -693,6 +766,8 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script>
     /* ===================== CONFIGURAÇÃO ===================== */
     const CHAVE_PEDIDOS = 'avante_pedidos_v4';
@@ -702,6 +777,15 @@
     const CHAVE_SOBRAS  = 'avante_sobras_v2';
     const CHAVE_TEMA    = 'avante_tema_v1';
     const CHAVE_ULTIMO_MATERIAL = 'avante_ultimo_material_v1';
+    const CHAVE_ULTIMA_ALTERACAO = 'avante_ultima_alteracao_v1';
+
+    const SUPABASE_URL = 'https://kxrroxwqohgjvisfames.supabase.co';
+    const SUPABASE_PUBLIC_KEY = 'sb_publishable_IBVYQGDNEhTa2IsiDwfwQg_CBy4yo5M';
+    const supabaseClient = window.supabase
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLIC_KEY, {
+          auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+        })
+      : null;
 
     let pedidos = [], artes = [], estoque = [], perdas = [], sobras = [];
     let abaAtual = 'fila';
@@ -711,6 +795,14 @@
     let exclusao = { tipo: '', id: null };
     let statusArteSelecionado = 'pendente';
     let toastTimer = null;
+
+    let usuarioAtual = null;
+    let sincronizacaoAtiva = false;
+    let aplicandoDadosNuvem = false;
+    let temporizadorSincronizacao = null;
+    let sincronizacaoEmAndamento = false;
+    let sincronizacaoPendente = false;
+    let revisaoLocal = 0;
 
     const STATUS_PEDIDO = {
       nao_iniciado: { rotulo: 'Não iniciado', classe: 'pendente', tag: 'tag-pendente', icone: '●' },
@@ -792,12 +884,240 @@
       sobras = carregarJson(CHAVE_SOBRAS, sobrasIniciais);
       salvarTudo();
     }
-    function salvarPedidos(){ localStorage.setItem(CHAVE_PEDIDOS, JSON.stringify(pedidos)); }
-    function salvarArtes(){ localStorage.setItem(CHAVE_ARTES, JSON.stringify(artes)); }
-    function salvarEstoque(){ estoque.forEach(e=>e.urgencia=calcularUrgencia(e.quantidade)); localStorage.setItem(CHAVE_ESTOQUE, JSON.stringify(estoque)); }
-    function salvarPerdas(){ localStorage.setItem(CHAVE_PERDAS, JSON.stringify(perdas)); }
-    function salvarSobras(){ localStorage.setItem(CHAVE_SOBRAS, JSON.stringify(sobras)); }
+    function marcarAlteracaoLocal() {
+      if (aplicandoDadosNuvem) return;
+      revisaoLocal += 1;
+      localStorage.setItem(CHAVE_ULTIMA_ALTERACAO, agoraLocal());
+      agendarSincronizacao();
+    }
+    function salvarPedidos(){ localStorage.setItem(CHAVE_PEDIDOS, JSON.stringify(pedidos)); marcarAlteracaoLocal(); }
+    function salvarArtes(){ localStorage.setItem(CHAVE_ARTES, JSON.stringify(artes)); marcarAlteracaoLocal(); }
+    function salvarEstoque(){ estoque.forEach(e=>e.urgencia=calcularUrgencia(e.quantidade)); localStorage.setItem(CHAVE_ESTOQUE, JSON.stringify(estoque)); marcarAlteracaoLocal(); }
+    function salvarPerdas(){ localStorage.setItem(CHAVE_PERDAS, JSON.stringify(perdas)); marcarAlteracaoLocal(); }
+    function salvarSobras(){ localStorage.setItem(CHAVE_SOBRAS, JSON.stringify(sobras)); marcarAlteracaoLocal(); }
     function salvarTudo(){ salvarPedidos(); salvarArtes(); salvarEstoque(); salvarPerdas(); salvarSobras(); }
+
+    /* ===================== SUPABASE: LOGIN E SINCRONIZAÇÃO ===================== */
+    function atualizarStatusSincronizacao(texto, classe='') {
+      const el = document.getElementById('status-sincronizacao');
+      if (!el) return;
+      el.textContent = texto;
+      el.className = `status-sync ${classe}`.trim();
+      el.title = texto;
+    }
+    function mostrarMensagemLogin(texto, erro=true) {
+      const el = document.getElementById('login-mensagem');
+      el.textContent = texto || '';
+      el.style.color = erro ? 'var(--vencido)' : 'var(--sucesso)';
+    }
+    function mostrarTelaLogin() {
+      document.body.classList.add('auth-pendente');
+      document.getElementById('tela-login').classList.remove('oculta');
+      document.getElementById('cabecalho-conta').hidden = true;
+      setTimeout(()=>document.getElementById('login-email').focus(), 80);
+    }
+    function mostrarAplicativo(modoLocal=false) {
+      document.body.classList.remove('auth-pendente');
+      document.getElementById('tela-login').classList.add('oculta');
+      document.getElementById('cabecalho-conta').hidden = false;
+      document.getElementById('usuario-email').textContent = modoLocal ? 'Modo local' : (usuarioAtual?.email || 'Conta conectada');
+      document.getElementById('btn-sair').textContent = modoLocal ? 'Voltar ao login' : 'Sair';
+      document.getElementById('btn-sincronizar').hidden = modoLocal;
+      atualizarStatusSincronizacao(modoLocal ? 'Somente neste aparelho' : 'Carregando...', modoLocal ? 'offline' : 'sincronizando');
+    }
+    function gravarColecaoLocal(chave, valor) {
+      localStorage.setItem(chave, JSON.stringify(valor));
+    }
+    function aplicarEstadoRecebido(data) {
+      aplicandoDadosNuvem = true;
+      try {
+        pedidos = (Array.isArray(data.pedidos) ? data.pedidos : []).map(migrarPedido);
+        artes = (Array.isArray(data.artes) ? data.artes : []).map(migrarArte);
+        estoque = (Array.isArray(data.estoque) ? data.estoque : []).map(migrarEstoque);
+        perdas = (Array.isArray(data.perdas) ? data.perdas : []).map(migrarPerda);
+        sobras = Array.isArray(data.sobras) ? data.sobras : [];
+        gravarColecaoLocal(CHAVE_PEDIDOS, pedidos);
+        gravarColecaoLocal(CHAVE_ARTES, artes);
+        gravarColecaoLocal(CHAVE_ESTOQUE, estoque);
+        gravarColecaoLocal(CHAVE_PERDAS, perdas);
+        gravarColecaoLocal(CHAVE_SOBRAS, sobras);
+      } finally {
+        aplicandoDadosNuvem = false;
+      }
+    }
+    function agendarSincronizacao(atraso=700) {
+      if (!sincronizacaoAtiva || !usuarioAtual || aplicandoDadosNuvem) return;
+      clearTimeout(temporizadorSincronizacao);
+      atualizarStatusSincronizacao(navigator.onLine ? 'Alterações pendentes' : 'Sem internet · salvo no aparelho', navigator.onLine ? 'pendente' : 'offline');
+      temporizadorSincronizacao = setTimeout(()=>salvarDadosNaNuvem(), atraso);
+    }
+    async function salvarDadosNaNuvem(forcar=false) {
+      if (!supabaseClient || !sincronizacaoAtiva || !usuarioAtual) return false;
+      if (!navigator.onLine) {
+        atualizarStatusSincronizacao('Sem internet · salvo no aparelho', 'offline');
+        return false;
+      }
+      if (sincronizacaoEmAndamento) {
+        sincronizacaoPendente = true;
+        return false;
+      }
+      sincronizacaoEmAndamento = true;
+      sincronizacaoPendente = false;
+      const revisaoEnviada = revisaoLocal;
+      atualizarStatusSincronizacao('Sincronizando...', 'sincronizando');
+      const payload = {
+        user_id: usuarioAtual.id,
+        pedidos,
+        artes,
+        estoque,
+        perdas,
+        sobras,
+        updated_at: new Date().toISOString()
+      };
+      try {
+        const { error } = await supabaseClient
+          .from('app_state')
+          .upsert(payload, { onConflict: 'user_id' });
+        if (error) throw error;
+        atualizarStatusSincronizacao('Sincronizado', 'ok');
+        if (forcar) mostrarToast('Dados sincronizados com o Supabase.');
+        return true;
+      } catch (erro) {
+        console.error('Erro ao sincronizar:', erro);
+        atualizarStatusSincronizacao('Falha na sincronização', 'erro');
+        if (forcar) alert(`Não foi possível sincronizar. Verifique a tabela app_state e as políticas RLS.\n\n${erro.message || erro}`);
+        return false;
+      } finally {
+        sincronizacaoEmAndamento = false;
+        if (sincronizacaoPendente || revisaoLocal > revisaoEnviada) agendarSincronizacao(150);
+      }
+    }
+    async function carregarDadosDaNuvem() {
+      if (!supabaseClient || !usuarioAtual) return;
+      atualizarStatusSincronizacao('Carregando dados...', 'sincronizando');
+      const { data, error } = await supabaseClient
+        .from('app_state')
+        .select('pedidos, artes, estoque, perdas, sobras, updated_at')
+        .eq('user_id', usuarioAtual.id)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) {
+        sincronizacaoAtiva = true;
+        const salvo = await salvarDadosNaNuvem(false);
+        if (!salvo) throw new Error('Não foi possível criar o primeiro registro no banco.');
+        atualizarStatusSincronizacao('Primeira sincronização concluída', 'ok');
+      } else {
+        aplicarEstadoRecebido(data);
+        sincronizacaoAtiva = true;
+        revisaoLocal = 0;
+        renderizarTudo();
+        atualizarStatusSincronizacao('Sincronizado', 'ok');
+      }
+    }
+    async function prepararAplicativoAutenticado(user) {
+      usuarioAtual = user;
+      sincronizacaoAtiva = false;
+      mostrarAplicativo(false);
+      try {
+        await carregarDadosDaNuvem();
+        renderizarTudo();
+        ativarAba(abaAtual || 'fila');
+      } catch (erro) {
+        console.error('Erro ao carregar banco:', erro);
+        atualizarStatusSincronizacao('Usando cópia local', 'erro');
+        alert(`Não foi possível carregar os dados do Supabase. O sistema continuará com a cópia deste aparelho.\n\n${erro.message || erro}`);
+        sincronizacaoAtiva = true;
+        renderizarTudo();
+      }
+    }
+    async function entrarNoSistema(evento) {
+      evento?.preventDefault();
+      if (!supabaseClient) {
+        mostrarMensagemLogin('A biblioteca do Supabase não foi carregada. Verifique sua conexão.');
+        return;
+      }
+      const email = document.getElementById('login-email').value.trim();
+      const senha = document.getElementById('login-senha').value;
+      const botao = document.getElementById('btn-entrar');
+      if (!email || !senha) {
+        mostrarMensagemLogin('Digite seu e-mail e sua senha.');
+        return;
+      }
+      botao.disabled = true;
+      botao.textContent = 'Entrando...';
+      mostrarMensagemLogin('Verificando sua conta...', false);
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: senha });
+        if (error) throw error;
+        document.getElementById('login-senha').value = '';
+        mostrarMensagemLogin('');
+        await prepararAplicativoAutenticado(data.user);
+      } catch (erro) {
+        console.error('Erro no login:', erro);
+        mostrarMensagemLogin('Não foi possível entrar. Confira o e-mail, a senha e se o usuário foi confirmado.');
+      } finally {
+        botao.disabled = false;
+        botao.textContent = 'Entrar';
+      }
+    }
+    function entrarEmModoLocal() {
+      usuarioAtual = null;
+      sincronizacaoAtiva = false;
+      mostrarAplicativo(true);
+      renderizarTudo();
+      ativarAba('fila');
+      mostrarToast('Modo local ativado. As alterações ficam somente neste aparelho.');
+    }
+    async function sairDoSistema() {
+      if (!usuarioAtual) {
+        mostrarTelaLogin();
+        return;
+      }
+      try {
+        clearTimeout(temporizadorSincronizacao);
+        await salvarDadosNaNuvem(false);
+        await supabaseClient.auth.signOut();
+      } catch (erro) {
+        console.error('Erro ao sair:', erro);
+      } finally {
+        usuarioAtual = null;
+        sincronizacaoAtiva = false;
+        document.getElementById('login-senha').value = '';
+        mostrarMensagemLogin('Sessão encerrada.', false);
+        mostrarTelaLogin();
+      }
+    }
+    function ligarEventosAutenticacao() {
+      document.getElementById('form-login').addEventListener('submit', entrarNoSistema);
+      document.getElementById('btn-modo-local').addEventListener('click', entrarEmModoLocal);
+      document.getElementById('btn-sair').addEventListener('click', sairDoSistema);
+      document.getElementById('btn-sincronizar').addEventListener('click', ()=>salvarDadosNaNuvem(true));
+      window.addEventListener('offline', ()=>{
+        if (sincronizacaoAtiva) atualizarStatusSincronizacao('Sem internet · salvo no aparelho', 'offline');
+      });
+      window.addEventListener('online', ()=>{
+        if (sincronizacaoAtiva) {
+          atualizarStatusSincronizacao('Reconectando...', 'sincronizando');
+          agendarSincronizacao(100);
+        }
+      });
+    }
+    async function iniciarAutenticacao() {
+      if (!supabaseClient) {
+        mostrarMensagemLogin('Não foi possível carregar o Supabase. Confira a internet e recarregue a página.');
+        return;
+      }
+      try {
+        const { data, error } = await supabaseClient.auth.getSession();
+        if (error) throw error;
+        if (data.session?.user) await prepararAplicativoAutenticado(data.session.user);
+        else mostrarTelaLogin();
+      } catch (erro) {
+        console.error('Erro ao verificar sessão:', erro);
+        mostrarMensagemLogin('Não foi possível verificar sua sessão. Você pode tentar novamente ou usar o modo local.');
+        mostrarTelaLogin();
+      }
+    }
 
     /* ===================== ABAS E TEMA ===================== */
     function ativarAba(nome) {
@@ -1043,7 +1363,16 @@
     }
     function renderizarTudo(){renderizarPedidos();renderizarArtes();renderizarEstoque();renderizarPerdas();renderizarSobras();renderizarFila();popularDropdownMateriais();}
 
-    document.addEventListener('DOMContentLoaded',()=>{carregarTudo();ligarEventos();aplicarTema();popularDropdownMateriais();renderizarTudo();ativarAba('fila');});
+    document.addEventListener('DOMContentLoaded', async ()=>{
+      aplicarTema();
+      carregarTudo();
+      ligarEventos();
+      ligarEventosAutenticacao();
+      popularDropdownMateriais();
+      renderizarTudo();
+      ativarAba('fila');
+      await iniciarAutenticacao();
+    });
   </script>
 </body>
 </html>
